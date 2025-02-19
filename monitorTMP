@@ -1,0 +1,11 @@
+waitPaths=(/{home,tmp})
+while read file ;do
+    if [ "$file" ] &&
+     ( [ -z "${file##*.php}" ] || [ -z  "${file##*.css}" ] ) ;then
+        (($(stat -c %Y-%X $file)))||echo -n new
+        echo file: $file, content:
+        cat $file
+    fi
+  done < <(
+    inotifywait -qme close_write --format %w%f ${waitPaths[*]}
+)

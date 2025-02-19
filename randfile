@@ -1,0 +1,7 @@
+ext=(php css other)
+while :;do
+    subname=''
+    ((RANDOM%10))||printf -v subname -- "-%04x" $RANDOM
+    date >/tmp/test$subname.${ext[RANDOM%3]}
+    sleep 1
+  done
