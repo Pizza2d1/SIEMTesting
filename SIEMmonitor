@@ -1,0 +1,34 @@
+if [[ ! $1 == "" ]]; then
+  MonitorPath=$1
+else
+  MonitorPath=/data/home/pizza2d1
+fi
+
+touch /data/home/LogSIEM.txt
+datatype=""
+inotifywait -m -r --format "%e %w%f" $MonitorPath |
+while read event fullpath; do
+  echo "Fullpath: $fullpath"
+  echo "Event: $event"
+  if [[ $event == *"ISDIR"* || ${fullpath: -1} == "/" ]]; then
+    datatype="FOLDER"
+  else
+    datatype="FILE"
+  fi
+  case $event in
+    *DELETE*)
+      echo "$(date +%D) at $(date +%T) $datatype DELETED: $fullpath" >> /data/home/LogSIEM.txt
+      ;;
+    *MODIFY*) #Modified events are rare for some reason, mostly only happen to editing proxy files such as .swp files
+      echo "$(date +%D) at $(date +%T) $datatype MODIFIED: $fullpath" >> /data/home/LogSIEM.txt
+      ;;
+    *CREATE*)
+      echo "$(date +%D) at $(date +%T) $datatype CREATED: $fullpath" >> /data/home/LogSIEM.txt
+      ;;
+    *MOVED_TO*)
+      echo "$(date +%D) at $(date +%T) $datatype MOVED TO: $fullpath" >> /data/home/LogSIEM.txt
+      ;;
+    *MOVED_FROM*)
+      echo "$(date +%D) at $(date +%T) $datatype MOVED FROM: $fullpath" >> /data/home/LogSIEM.txt
+  esac
+done

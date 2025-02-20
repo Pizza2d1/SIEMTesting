@@ -1,0 +1,21 @@
+if [ ! -f ./logged_folders.txt ]; then
+  touch logged_folders
+fi
+
+echo before
+echo > ./logged_folders.txt
+
+iter=0
+
+echo right
+while read -r LINE; do
+  if [[ $LINE == *"FOLDER"* ]]; then
+    echo $LINE >> ./logged_folders.txt
+    ((iter+=1))
+    if [[ $(($iter % 100)) == "0" ]]; then
+      echo "$iter folders scanned"
+    fi
+  fi
+done < "/data/home/LogSIEM.txt"
+
+echo "DONE"
